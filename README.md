@@ -2,7 +2,7 @@
 
 VeriLog is a **decentralized, tamper-evident audit logging system** designed for distributed and microservices-based architectures. It ensures log integrity through cryptographic verification and optional blockchain anchoring.
 
-The system is implemented in **Rust** to achieve high performance, memory safety, and predictable concurrency behavior.
+The system is implemented in **Rust** to achieve high performance, memory safety, and predictable concurrency behavior...
 
 ---
 
