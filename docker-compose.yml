@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - APP_ENV=production
+      - DATABASE_URL=/app/data/verilog.db
+      - DASHBOARD_PATH=/app/dashboard
+      - MOCK_SOLANA=true
+      - SOLANA_RPC_URL=http://127.0.0.1:8899
+    volumes:
+      - verilog-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  verilog-data:

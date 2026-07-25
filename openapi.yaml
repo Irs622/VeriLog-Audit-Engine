@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: VeriLog Audit Engine Agent API
+  description: Decentralized, tamper-evident audit logging engine with cryptographic Merkle proof verification and Solana blockchain anchoring.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local Agent Server
+
+paths:
+  /api/health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: Agent and DB status
+
+  /api/stats:
+    get:
+      summary: Get system audit statistics
+      responses:
+        '200':
+          description: Total logs, batches, and tampered count
+
+  /api/logs:
+    get:
+      summary: Query ingested audit logs with pagination
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of audit logs with pagination total
+
+  /api/collect:
+    post:
+      summary: Ingest a new audit log
+      parameters:
+        - name: X-API-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - service
+                - user_id
+                - amount
+                - timestamp
+              properties:
+                service:
+                  type: string
+                user_id:
+                  type: string
+                amount:
+                  type: number
+                timestamp:
+                  type: string
+                event_type:
+                  type: string
+                actor_id:
+                  type: string
+                signature:
+                  type: string
+                public_key:
+                  type: string
+      responses:
+        '200':
+          description: Ingestion confirmation
+
+  /api/batches:
+    get:
+      summary: List recent log batches and Merkle roots
+      responses:
+        '200':
+          description: Array of batches with on-chain status
+
+  /api/batches/{id}/verify:
+    get:
+      summary: Perform Merkle tree integrity verification on a specific batch
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Integrity verification result (VALID or TAMPERED)

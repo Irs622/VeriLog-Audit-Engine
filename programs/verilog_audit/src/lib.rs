@@ -33,7 +33,7 @@ pub struct RecordAuditLog<'info> {
     #[account(
         init,
         payer = authority,
-        space = 8 + 32 + 8 + 50 + 50 + 32, // Discriminator + Root + TS + String Vec + pubkey
+        space = 8 + AuditLogState::INIT_SPACE,
         seeds = [b"audit", authority.key().as_ref(), service_id.as_bytes(), batch_id.as_bytes()],
         bump
     )]
@@ -46,10 +46,13 @@ pub struct RecordAuditLog<'info> {
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct AuditLogState {
     pub merkle_root: [u8; 32],
     pub timestamp: i64,
+    #[max_len(64)]
     pub service_id: String,
+    #[max_len(64)]
     pub batch_id: String,
     pub authority: Pubkey,
 }

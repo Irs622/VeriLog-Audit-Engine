@@ -15,6 +15,8 @@ pub fn init_db_from_connection(conn: &Connection) -> Result<()> {
             batch_id TEXT,
             event_type TEXT DEFAULT 'SYSTEM',
             actor_id TEXT DEFAULT 'system-agent',
+            signature TEXT,
+            public_key TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE IF NOT EXISTS batches (
@@ -27,6 +29,11 @@ pub fn init_db_from_connection(conn: &Connection) -> Result<()> {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );"
     )?;
+
+    // Auto-Migration for existing databases lacking signature/public_key
+    let _ = conn.execute("ALTER TABLE audit_logs ADD COLUMN signature TEXT;", []);
+    let _ = conn.execute("ALTER TABLE audit_logs ADD COLUMN public_key TEXT;", []);
+
     Ok(())
 }
 

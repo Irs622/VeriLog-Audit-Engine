@@ -186,25 +186,18 @@ Typical parameters:
 
 ---
 
-## Roadmap
+## Quick Start (Docker Compose)
 
-- [ ] Merkle tree optimization for batch verification
-- [ ] Digital signatures for non-repudiation
-- [ ] Distributed multi-agent ingestion
-- [ ] Real-time dashboard (observability)
-- [ ] Full Solana/Anchor integration
+Run the Agent server with Dashboard bundled:
 
----
+```bash
+docker-compose up -d --build
+```
 
-## Use Cases
-
-- Microservices audit logging
-- Financial transaction traceability
-- Compliance and audit systems
-- Security-critical infrastructures
+Access the dashboard at `http://localhost:3000`.
 
 ---
 
 ## License
 
-MIT / Apache 2.0 (Please specify)
+Dual-licensed under [MIT](file:///Users/mac/untitled%20folder/VeriLog-Audit-Engine/LICENSE) or [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) at your option.

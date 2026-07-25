@@ -57,13 +57,53 @@ pub struct AuditLog {
     pub batch_id: Option<String>,
     pub event_type: Option<String>,
     pub actor_id: Option<String>,
+    pub signature: Option<String>,
+    pub public_key: Option<String>,
 }
 
 impl AuditLog {
     pub fn compute_hash(&self) -> String {
-        let payload = format!("{}|{}|{}|{}", self.service, self.user_id, self.amount, self.timestamp);
+        let event_type = self.event_type.as_deref().unwrap_or("SYSTEM");
+        let actor_id = self.actor_id.as_deref().unwrap_or("system-agent");
+        let payload = format!(
+            "{}|{}|{}|{}|{}|{}",
+            self.service, self.user_id, self.amount, self.timestamp, event_type, actor_id
+        );
         let hash_bytes = Keccak256Algorithm::hash(payload.as_bytes());
         hex::encode(hash_bytes)
+    }
+
+    pub fn verify_signature(&self) -> bool {
+        match (&self.signature, &self.public_key) {
+            (Some(sig_hex), Some(pk_hex)) => {
+                let sig_bytes = match hex::decode(sig_hex) {
+                    Ok(b) if b.len() == 64 => {
+                        let mut arr = [0u8; 64];
+                        arr.copy_from_slice(&b);
+                        arr
+                    }
+                    _ => return false,
+                };
+                let pk_bytes = match hex::decode(pk_hex) {
+                    Ok(b) if b.len() == 32 => {
+                        let mut arr = [0u8; 32];
+                        arr.copy_from_slice(&b);
+                        arr
+                    }
+                    _ => return false,
+                };
+
+                let verifying_key = match ed25519_dalek::VerifyingKey::from_bytes(&pk_bytes) {
+                    Ok(k) => k,
+                    Err(_) => return false,
+                };
+                let signature = ed25519_dalek::Signature::from_bytes(&sig_bytes);
+                let hash_str = self.hash.clone().unwrap_or_else(|| self.compute_hash());
+
+                verifying_key.verify_strict(hash_str.as_bytes(), &signature).is_ok()
+            }
+            _ => true, // Signature optional for backwards compatibility
+        }
     }
 }
 
